@@ -1,0 +1,10 @@
+#debit-card {
+  background: rgb(255, 64, 102);
+  background: linear-gradient(141deg, rgba(255, 64, 102, 1) 0%, rgba(255, 241, 106, 1) 93%);
+}
+#response-box{
+  transform: translate(-50%,-50%);
+}
+.blur-me{
+  filter: blur(4px);
+}

@@ -1,0 +1,5 @@
+backend/env
+backend/drbank/.env
+backend/media/profiles
+backend/static
+db.sqlite3
