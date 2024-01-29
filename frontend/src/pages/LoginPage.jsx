@@ -1,11 +1,19 @@
-import React, {useContext} from 'react'
+import React, {useContext, useEffect} from 'react'
 import {Authenticate} from '../context/AuthContext'
 import peoplePNG from '../assets/images/people-ai.png'
-import { Link } from 'react-router-dom';
-export default function LoginPage() {
+import { Link, useNavigate } from 'react-router-dom';
+import { Circles } from 'react-loader-spinner'
 
-    const { loginUser,loginResponse } = useContext(Authenticate);
-    console.log("user login ",loginResponse)
+
+export default function LoginPage() {
+    const navigate = useNavigate();
+    const { loginUser,loginwWait,loginResponse,user } = useContext(Authenticate);
+
+    useEffect(()=>{
+        if (user!==null){
+            navigate('/')
+        }
+    },[])
   return (
     <div className='bg-[#eee9e6] flex items-center py-[10%] font-poppins'>
    
@@ -23,8 +31,19 @@ export default function LoginPage() {
                 </div>
                 <Link >Forget Password</Link>
             </div>
-            <button  className='bg-slate-900 text-white py-1 rounded-md'>Log In</button>
-            {loginResponse['detail'] && <><h2 className='text-red-500 font-lato text-sm'>Something went wrong! check your credintials</h2></>}
+            {loginwWait ? <div className='flex justify-center'>
+          <Circles
+            height="30"
+            width="30"
+            color="#4fa94d"
+            ariaLabel="circles-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+        </div> :  <button  className='bg-slate-900 text-white py-1 rounded-md'>Log In</button>}
+           
+            {loginResponse && loginResponse['detail'] && <><h2 className='text-red-500 font-lato text-sm'>Something went wrong! check your credintials</h2></>}
             <button className='bg-white text-slate-900 py-1 rounded-md'>Sign in with Google</button>
             <p className='text-sm text-center'>Don't have an account? <Link className='underline' to="/signup">Signup</Link></p>
         </form>

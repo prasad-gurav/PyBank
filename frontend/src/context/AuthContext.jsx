@@ -17,10 +17,22 @@ function AuthContext(props) {
 
     let [authTokens, setAuthTokens] = useState(() => localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null)
     let [user, setUser] = useState(() => localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null)
+
     let [loading, setLoading] = useState(true)
     const [loginResponse,setLoginResponse] = useState()
+    const [loginwWait,setLoginWait] = useState(false)
+    
+    const [signupWait,setSignupWait] = useState(false)
+    const [signupResponse,setSignupResponse] = useState()
+    const [signupErrorResponse,setSignupErrorResponse] = useState(null)
+
+    const handleSignupErrorBox = () => {
+        setSignupErrorResponse(null)
+    }
+
     let signupUser = async (e) => {
         e.preventDefault();
+        setSignupWait(true)
         let userSubmitedData = {
             first_name: e.target.first_name.value,
             last_name: e.target.last_name.value,
@@ -46,10 +58,12 @@ function AuthContext(props) {
                 },
                 "data": userSubmitedData
             }).then((response) => {
+                setSignupWait(false)
+                setSignupResponse(response.data)
                 console.log(response.data)
-      
                 console.log(response)
                 if (response.status === 200) {
+            
                     console.log("Succeed")
                     navigate('login')
 
@@ -59,11 +73,14 @@ function AuthContext(props) {
         }
         catch (error) {
             console.log(error)
+            setSignupWait(false)
+            setSignupErrorResponse([error.response.data])
+            console.log(error.response.data)
         }
     }
     const loginUser = async (e) => {
         e.preventDefault();
-
+        setLoginWait(true)
         let email = e.target.email.value;
         let password = e.target.password.value;
         let response = await fetch(`${backendUrl}/accounts/login/`, {
@@ -75,6 +92,7 @@ function AuthContext(props) {
 
         })
         let data = await response.json()
+        setLoginWait(false)
         setLoginResponse(data)
         if (response.status === 200) {
             setAuthTokens(data)
@@ -83,6 +101,7 @@ function AuthContext(props) {
             navigate('/')
         }
         else {
+            setLoginWait(false)
             console.log('Something Went Wrong')
         }
 
@@ -127,8 +146,10 @@ function AuthContext(props) {
         logoutUser: logoutUser,
         user: user,
         authTokens: authTokens,
-        loginResponse:loginResponse
-    }
+        loginResponse:loginResponse,loginwWait:loginwWait,
+        signupResponse:signupResponse,signupErrorResponse:signupErrorResponse,signupWait:signupWait,
+        handleSignupErrorBox:handleSignupErrorBox
+    }   
 
     // this useEffect for refresh auth token after centain of time 
     useEffect(() => {

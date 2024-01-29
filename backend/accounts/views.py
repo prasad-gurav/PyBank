@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from accounts.utils import generate_random_number,generate_random_string
 from rest_framework.views import APIView
-
+import os
 from rest_framework.parsers import MultiPartParser,FormParser
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
@@ -15,7 +15,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from rest_framework.decorators import action
-
+from accounts.send_email import sendMail,send_verify_email
 
 class accountViewset(viewsets.ModelViewSet):
     queryset = accounts.objects.all()
@@ -46,6 +46,7 @@ class SignupViewSet(viewsets.ModelViewSet):
         user = serializer.save()
         user.set_password(user.password)
         user.account_num = generate_random_number()
+        user.account_bal = 2000
         user.save()
         verify_token = generate_random_string(16)
         user.verify_access_token = verify_token
@@ -57,6 +58,8 @@ class SignupViewSet(viewsets.ModelViewSet):
             'user_id': user.id,
             'verify_token':verify_token
         }
+        
+        send_verify_email(user.email,f'{user.first_name} {user.last_name}',f'http://localhost:3000/verifyuser/{user.id}-{verify_token}')
         return Response(success_data, status=status.HTTP_200_OK, headers=headers)
     
 
@@ -197,6 +200,7 @@ class transactHistViewset(viewsets.ViewSet):
         for i in range(len(serialized_data)):
             serialized_data[i]['additional_data'] = transaction_dict[i]
         return Response(serialized_data)
+    
 class verify_me(viewsets.ViewSet):
     serializer_class = verifySerializer
     permission_classes = [permissions.AllowAny]
@@ -215,6 +219,7 @@ class verify_me(viewsets.ViewSet):
             user_data.is_active = True
             user_data.save()
             success_res = {'status':'User verified'}
+            sendMail(user_data)
         # # Serialize the transactions and return the response
         # serializer = self.serializer_class(user_data)
         

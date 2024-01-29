@@ -43,7 +43,7 @@ function VerifyUser() {
                 <Controls visible={false} />
             </Player>
 
-            {userVerified ? <> <NavLink className="font-poppins font-bold hover:bg-white hover:text-orange bg-orange w-[200px] text-slate-200 rounded-md my-4 text-center" to={'login'}>LOGIN</NavLink> </>:
+            {userVerified ? <> <NavLink className="font-poppins font-bold hover:bg-white hover:text-orange bg-orange w-[200px] text-slate-200 rounded-md my-4 text-center" to={'/login'}>LOGIN</NavLink> </>:
             <>
             {loading ? <Circles
                 height="30"
